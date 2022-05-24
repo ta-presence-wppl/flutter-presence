@@ -6,6 +6,6 @@ void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     title: 'Splash Screen',
-    home: HomePageTemp(),
+    home: SplashScreenPage(),
   ));
 }

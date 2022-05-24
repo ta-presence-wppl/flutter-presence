@@ -326,6 +326,7 @@ class HomePageState extends State<HomePage> {
       title: Text(title),
       trailing: Icon(iconTrailing),
       onTap: () {
+        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
