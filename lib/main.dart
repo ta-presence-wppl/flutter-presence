@@ -1,11 +1,34 @@
+//import 'dart:_http';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:wppl_frontend/history.dart';
+import 'package:wppl_frontend/home_page.dart';
+import 'package:wppl_frontend/login_view.dart';
+import 'package:wppl_frontend/salary.dart';
 import 'package:wppl_frontend/splashscreen_view.dart';
 import 'package:wppl_frontend/home_page_temp.dart';
 
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     title: 'Splash Screen',
-    home: SplashScreenPage(),
+    routes: {
+      '/': (context) => SplashScreenPage(),
+      '/login': (context) => LoginPage(),
+      '/home': (context) => HomePage(),
+      '/salary': (context) => Salary(),
+      '/histori': (context) => History(),
+    },
   ));
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }
