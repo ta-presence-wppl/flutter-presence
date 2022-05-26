@@ -1,18 +1,13 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/icon_data.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wppl_frontend/api/api_routes.dart';
 import 'package:wppl_frontend/map_screen.dart';
-import 'package:wppl_frontend/models/m_response.dart';
 import 'package:wppl_frontend/settings_page.dart';
 import 'package:wppl_frontend/boss_permission.dart';
-import 'package:wppl_frontend/history.dart';
-import 'package:wppl_frontend/salary.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,12 +24,13 @@ class HomePageState extends State<HomePage> {
   final picker = ImagePicker();
   File? uploadimage;
   final ApiRoutes _apiRoutes = ApiRoutes();
-  String? _latitude, _longitude;
+  String? _latitude, _longitude, _statusAbsent = "";
 
   @override
   void initState() {
     super.initState();
     getLatLong();
+    getInfo();
   }
 
   void getLatLong() async {
@@ -64,25 +60,49 @@ class HomePageState extends State<HomePage> {
       var choosedimage =
           await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
       if (choosedimage != null) {
-        // setState(() {
-        //   uploadimage = File(choosedimage.path);
-        // });
         _apiRoutes
             .absentIN(File(choosedimage.path), _latitude, _longitude)
-            .then((value) => {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(value!.responseMessage!)),
+            .then(
+              (value) => {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(value!.responseMessage!),
                   ),
-                });
-        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        //   content: Text('Berhasil Absen Masuk!'),
-        // ));
-        //base64Image = base64Encode(File(choosedimage.path).readAsBytesSync());
+                ),
+              },
+            );
       }
     } catch (e) {
       print(e);
     }
-    //return choosedimage;
+  }
+
+  void chooseImageOut() async {
+    try {
+      var choosedimage =
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+      if (choosedimage != null) {
+        _apiRoutes
+            .absentOut(File(choosedimage.path), _latitude, _longitude)
+            .then(
+              (value) => {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(value!.responseMessage!),
+                  ),
+                ),
+              },
+            );
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void getInfo() async {
+    await _apiRoutes.getAbsenStatus(context).then((_user) {
+      _statusAbsent = _user!.responseMessage;
+    });
   }
 
   @override
@@ -91,47 +111,42 @@ class HomePageState extends State<HomePage> {
     String formattedDate = DateFormat('dd/MM/yyyy').format(now);
     String formattedHour = DateFormat('HH:mm ').format(now);
 
-    final ButtonStyle style = ElevatedButton.styleFrom(
-      textStyle: const TextStyle(fontSize: 20),
-    );
     final _listPage = <Widget>[
       /* Work From Home */
       Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Container(
-            child: Container(
-              width: 390,
-              child: Text(
-                '             Tanggal  :  ' +
-                    formattedDate +
-                    ' \n                 Pukul  :  ' +
-                    formattedHour,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
-                  fontFamily: 'ABZReg',
-                  color: Color(0xff278cbd),
-                ),
+            width: 390,
+            child: Text(
+              '             Tanggal  :  ' +
+                  formattedDate +
+                  ' \n                 Pukul  :  ' +
+                  formattedHour,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20.0,
+                fontFamily: 'ABZReg',
+                color: Color(0xff278cbd),
               ),
-              margin: const EdgeInsets.all(5.0),
-              padding: const EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Color(0xff278cbd)),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(15.0),
-                ),
+            ),
+            margin: const EdgeInsets.all(5.0),
+            padding: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xff278cbd)),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(15.0),
               ),
             ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SizedBox(height: 55),
+              const SizedBox(height: 55),
               ElevatedButton.icon(
-                icon: Icon(Icons.access_time_rounded),
-                label: Text(
+                icon: const Icon(Icons.access_time_rounded),
+                label: const Text(
                   "Presensi Masuk",
                   style: TextStyle(
                     fontSize: 18,
@@ -144,31 +159,46 @@ class HomePageState extends State<HomePage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16.0),
                   ),
-                  primary: Color(0xff278cbd),
+                  primary: const Color(0xff278cbd),
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               ElevatedButton.icon(
-                icon: Icon(Icons.access_alarms_rounded),
-                label: Text(
+                icon: const Icon(Icons.access_alarms_rounded),
+                label: const Text(
                   "Presensi Pulang",
                   style: TextStyle(
                     fontSize: 18,
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  chooseImageOut();
+                },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16.0),
                   ),
-                  primary: Color(0xff278cbd),
+                  primary: const Color(0xff278cbd),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
           Container(
             child: Text(
+              _statusAbsent!,
+              textAlign: TextAlign.left,
+              style: const TextStyle(
+                color: Color.fromARGB(255, 35, 141, 9),
+                fontWeight: FontWeight.bold,
+                fontFamily: 'ABZReg',
+                fontSize: 14,
+              ),
+            ),
+            margin: const EdgeInsets.all(16.0),
+          ),
+          Container(
+            child: const Text(
               "Lokasi WFH anda saat ini:",
               textAlign: TextAlign.left,
               style: TextStyle(
@@ -178,10 +208,10 @@ class HomePageState extends State<HomePage> {
                 fontSize: 24,
               ),
             ),
-            margin: EdgeInsets.all(16.0),
+            margin: const EdgeInsets.all(16.0),
           ),
-          Container(
-            height: 327,
+          SizedBox(
+            height: 300,
             child: MapScreen(),
           ),
         ],
@@ -191,39 +221,37 @@ class HomePageState extends State<HomePage> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Container(
-            child: Container(
-              width: 390,
-              child: Text(
-                '             Tanggal  :  ' +
-                    formattedDate +
-                    ' \n                 Pukul  :  ' +
-                    formattedHour,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
-                  fontFamily: 'ABZReg',
-                  color: Color(0xff278cbd),
-                ),
+            width: 390,
+            child: Text(
+              '             Tanggal  :  ' +
+                  formattedDate +
+                  ' \n                 Pukul  :  ' +
+                  formattedHour,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20.0,
+                fontFamily: 'ABZReg',
+                color: Color(0xff278cbd),
               ),
-              margin: const EdgeInsets.all(5.0),
-              padding: const EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Color(0xff278cbd)),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(15.0),
-                ),
+            ),
+            margin: const EdgeInsets.all(5.0),
+            padding: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xff278cbd)),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(15.0),
               ),
             ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SizedBox(height: 55),
+              const SizedBox(height: 55),
               ElevatedButton.icon(
-                icon: Icon(Icons.access_time_rounded),
-                label: Text(
+                icon: const Icon(Icons.access_time_rounded),
+                label: const Text(
                   "Presensi Masuk",
                   style: TextStyle(
                     fontSize: 18,
@@ -234,13 +262,13 @@ class HomePageState extends State<HomePage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16.0),
                   ),
-                  primary: Color(0xff278cbd),
+                  primary: const Color(0xff278cbd),
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               ElevatedButton.icon(
-                icon: Icon(Icons.access_alarms_rounded),
-                label: Text(
+                icon: const Icon(Icons.access_alarms_rounded),
+                label: const Text(
                   "Presensi Pulang",
                   style: TextStyle(
                     fontSize: 18,
@@ -251,14 +279,27 @@ class HomePageState extends State<HomePage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16.0),
                   ),
-                  primary: Color(0xff278cbd),
+                  primary: const Color(0xff278cbd),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
           Container(
             child: Text(
+              _statusAbsent!,
+              textAlign: TextAlign.left,
+              style: const TextStyle(
+                color: Color.fromARGB(255, 35, 141, 9),
+                fontWeight: FontWeight.bold,
+                fontFamily: 'ABZReg',
+                fontSize: 14,
+              ),
+            ),
+            margin: const EdgeInsets.all(16.0),
+          ),
+          Container(
+            child: const Text(
               "Lokasi WFO anda saat ini:",
               textAlign: TextAlign.left,
               style: TextStyle(
@@ -268,10 +309,10 @@ class HomePageState extends State<HomePage> {
                 fontSize: 24,
               ),
             ),
-            margin: EdgeInsets.all(16.0),
+            margin: const EdgeInsets.all(16.0),
           ),
-          Container(
-            height: 327,
+          SizedBox(
+            height: 300,
             child: MapScreen(),
           ),
         ],
@@ -291,19 +332,19 @@ class HomePageState extends State<HomePage> {
           label: 'Work From Office',
         ),
       ],
-      selectedLabelStyle: TextStyle(fontSize: 16),
-      unselectedLabelStyle: TextStyle(fontSize: 12),
+      selectedLabelStyle: const TextStyle(fontSize: 16),
+      unselectedLabelStyle: const TextStyle(fontSize: 12),
       currentIndex: _selectedTabIndex,
       iconSize: 36,
-      selectedItemColor: Color(0xff278cbd),
+      selectedItemColor: const Color(0xff278cbd),
       unselectedItemColor: Colors.grey,
       onTap: _onNavBarTapped,
     );
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xff278cbd),
-        title: Text(
+        backgroundColor: const Color(0xff278cbd),
+        title: const Text(
           'BERANDA',
           style: TextStyle(
             fontFamily: 'ABZReg',
@@ -338,7 +379,7 @@ class HomePageState extends State<HomePage> {
                           child: Image.asset("assets/images/profile.jpg")),
                     ),
                   ),
-                  VerticalDivider(
+                  const VerticalDivider(
                     color: Color(0xff278cbd),
                     thickness: 25.0,
                   ),
@@ -362,7 +403,7 @@ class HomePageState extends State<HomePage> {
                           if (snapshot.hasData) {
                             return Text('' + snapshot.data!);
                           }
-                          return Text('Gagal');
+                          return const Text('Gagal');
                         },
                       ),
                       FutureBuilder<String>(
@@ -373,55 +414,29 @@ class HomePageState extends State<HomePage> {
                           if (snapshot.hasData) {
                             return Text('' + snapshot.data!);
                           }
-                          return Text('Gagal');
+                          return const Text('Gagal');
                         },
                       ),
                     ],
                   ),
                 ],
               ),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xff278cbd),
               ),
             ),
-            _buildListTile(Icons.house_rounded, "Beranda", null, HomePage()),
-            // _buildListTile(Icons.perm_contact_calendar_rounded,
-            //     "Histori Presensi", null, History()),
-            ListTile(
-              contentPadding: EdgeInsets.only(left: 40.0),
-              leading: Icon(Icons.history, color: Colors.grey, size: 25),
-              title: Text(
-                'Histori Presensi',
-                style: TextStyle(fontFamily: 'Montserrat'),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/histori');
-              },
-            ),
+            //_buildListTile(Icons.house_rounded, "Beranda", null, '/home'),
+            _buildListTile(Icons.perm_contact_calendar_rounded,
+                "Histori Presensi", null, '/histori'),
             _buildListTile(Icons.contact_mail_outlined, "Pengajuan Izin", null,
-                BossPermission()),
-            // _buildListTile(
-            //     Icons.monetization_on_outlined, "Slip Gaji", null, Salary()),
-
-            ListTile(
-              contentPadding: EdgeInsets.only(left: 40.0),
-              leading:
-                  Icon(Icons.person_pin_outlined, color: Colors.grey, size: 25),
-              title: Text(
-                'Slip Gaji',
-                style: TextStyle(fontFamily: 'Montserrat'),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/salary');
-              },
-            ),
-            _buildListTile(Icons.settings, "Pengaturan", null, SettingsPage()),
-            Divider(
+                '/pengajuan_izin'),
+            _buildListTile(
+                Icons.monetization_on_outlined, "Slip Gaji", null, '/salary'),
+            _buildListTile(Icons.settings, "Pengaturan", null, '/pengaturan'),
+            const Divider(
               height: 20.0,
             ),
-            _buildListTile(null, "Logout", Icons.input, SettingsPage()),
+            _buildListTile(null, "Logout", Icons.input, ''),
           ],
         ),
       ),
@@ -432,7 +447,7 @@ class HomePageState extends State<HomePage> {
     IconData? iconLeading,
     String title,
     IconData? iconTrailing,
-    Widget PindahYuk,
+    String route,
   ) {
     return ListTile(
       leading: Icon(iconLeading),
@@ -440,12 +455,7 @@ class HomePageState extends State<HomePage> {
       trailing: Icon(iconTrailing),
       onTap: () {
         Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PindahYuk,
-          ),
-        );
+        Navigator.pushNamed(context, route);
       },
     );
   }
