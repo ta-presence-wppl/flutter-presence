@@ -1,10 +1,13 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart' as dio;
 import 'dart:convert';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
+import 'package:wppl_frontend/models/m_history.dart';
 import 'package:wppl_frontend/models/m_response.dart';
 
 class ApiRoutes {
@@ -12,7 +15,8 @@ class ApiRoutes {
   final String _baseAPI =
       "https://api-ta-presence-gateaway.behindrailstudio.com";
 
-  Future<MResponse?> absentIN(File fileImage) async {
+  Future<MResponse?> absentIN(
+      File fileImage, String? _latitude, String? _longitude) async {
     try {
       final SharedPreferences prefs = await _prefs;
       final String? token = prefs.getString('token');
@@ -29,7 +33,7 @@ class ApiRoutes {
 
       //[3] ADDING EXTRA INFO
       var formData =
-          dio.FormData.fromMap({'lokasi_msk': '-6.904413, 107.598814'});
+          dio.FormData.fromMap({'lokasi_msk': '$_latitude, $_longitude'});
 
       //[4] ADD IMAGE TO UPLOAD
       var file = await dio.MultipartFile.fromFile(fileImage.path,
@@ -43,16 +47,15 @@ class ApiRoutes {
         '/absent_service/absent/in',
         data: formData,
       );
-      final result = json.decode(response.toString());
-      print(result);
       return responseData(response.data);
     } catch (err) {
-      print('ERROR  $err');
-      return null;
+      Map<String, dynamic> retval = {"message": "Anda Telah Absen Hari Ini!"};
+      return responseData(retval);
     }
   }
 
-  Future<MResponse?> getHistoryAbsen(String myDate) async {
+  Future<List<MHistori>?> getHistoryAbsen(
+      BuildContext context, String myDate) async {
     try {
       final SharedPreferences prefs = await _prefs;
       final String? token = prefs.getString('token');
@@ -61,17 +64,21 @@ class ApiRoutes {
       var dioRequest = dio.Dio();
       dioRequest.options.baseUrl = _baseAPI;
 
+      dioRequest.options.responseType = dio.ResponseType.json;
+
       ///[2] ADDING TOKEN
       dioRequest.options.headers = {'Authorization': token};
 
       ///[3] SEND TO SERVER
-      var response =
-          await dioRequest.get('/absent_service/absent/history?date=$myDate');
-
-      return responseData(response.data);
+      Response<String> response = await dioRequest
+          .get('/absent_service/absent/history?date=2022-05-26');
+      return responseHistori(response.data);
+      print('tes');
     } catch (err) {
-      print('ERROR  $err');
-      return null;
+      print('Error Dio $err');
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Kesalahan pada Server!'),
+      ));
     }
   }
 }
