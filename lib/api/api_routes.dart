@@ -54,6 +54,69 @@ class ApiRoutes {
     }
   }
 
+  Future<MResponse?> absentOut(
+      File fileImage, String? _latitude, String? _longitude) async {
+    try {
+      final SharedPreferences prefs = await _prefs;
+      final String? token = prefs.getString('token');
+
+      ///[1] CREATING INSTANCE
+      var dioRequest = dio.Dio();
+      dioRequest.options.baseUrl = _baseAPI;
+
+      //[2] ADDING TOKEN
+      dioRequest.options.headers = {
+        'Authorization': token,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      };
+
+      //[3] ADDING EXTRA INFO
+      var formData =
+          dio.FormData.fromMap({'lokasi_msk': '$_latitude, $_longitude'});
+
+      //[4] ADD IMAGE TO UPLOAD
+      var file = await dio.MultipartFile.fromFile(fileImage.path,
+          filename: basename(fileImage.path),
+          contentType: MediaType("image", basename(fileImage.path)));
+
+      formData.files.add(MapEntry('image', file));
+
+      //[5] SEND TO SERVER
+      var response = await dioRequest.post(
+        '/absent_service/absent/out',
+        data: formData,
+      );
+      return responseData(response.data);
+    } catch (err) {
+      Map<String, dynamic> retval = {"message": "Anda Telah Absen Hari Ini!"};
+      return responseData(retval);
+    }
+  }
+
+  Future<MResponse?> getAbsenStatus(BuildContext context) async {
+    try {
+      final SharedPreferences prefs = await _prefs;
+      final String? token = prefs.getString('token');
+
+      ///[1] CREATING INSTANCE
+      var dioRequest = dio.Dio();
+      dioRequest.options.baseUrl = _baseAPI;
+
+      dioRequest.options.responseType = dio.ResponseType.json;
+
+      ///[2] ADDING TOKEN
+      dioRequest.options.headers = {'Authorization': token};
+
+      ///[3] SEND TO SERVER
+      var response = await dioRequest.get('/absent_service/absent/status');
+      return responseData(response.data);
+    } catch (err) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Kesalahan pada Server!'),
+      ));
+    }
+  }
+
   Future<List<MHistori>?> getHistoryAbsen(
       BuildContext context, String myDate) async {
     try {
@@ -75,7 +138,6 @@ class ApiRoutes {
       return responseHistori(response.data);
       print('tes');
     } catch (err) {
-      print('Error Dio $err');
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Kesalahan pada Server!'),
       ));
