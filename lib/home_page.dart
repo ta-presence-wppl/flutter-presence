@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/icon_data.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wppl_frontend/api/api_routes.dart';
 import 'package:wppl_frontend/map_screen.dart';
@@ -24,17 +25,25 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   int _selectedTabIndex = 0;
-  //Future<String> _name;
+  Location currentLocation = Location();
   final picker = ImagePicker();
   File? uploadimage;
   final ApiRoutes _apiRoutes = ApiRoutes();
+  String? _latitude, _longitude;
 
   @override
   void initState() {
     super.initState();
-    // _name = _prefs.then((SharedPreferences value) {
-    //   return value.getString('nama');
-    // });
+    getLatLong();
+  }
+
+  void getLatLong() async {
+    currentLocation.onLocationChanged.listen((LocationData loc) {
+      setState(() {
+        _latitude = loc.latitude.toString();
+        _longitude = loc.longitude.toString();
+      });
+    });
   }
 
   Future<String> getShared(String key) async {
@@ -58,13 +67,13 @@ class HomePageState extends State<HomePage> {
         // setState(() {
         //   uploadimage = File(choosedimage.path);
         // });
-        _apiRoutes.absentIN(File(choosedimage.path)).then(
-              (value) => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Berhasil Absen Masuk!'),
-                ),
-              ),
-            );
+        _apiRoutes
+            .absentIN(File(choosedimage.path), _latitude, _longitude)
+            .then((value) => {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(value!.responseMessage!)),
+                  ),
+                });
         // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         //   content: Text('Berhasil Absen Masuk!'),
         // ));

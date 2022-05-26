@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/icon_data.dart';
+import 'package:wppl_frontend/api/api_routes.dart';
 import 'package:wppl_frontend/home_page.dart';
+import 'package:wppl_frontend/models/m_history.dart';
 import 'package:wppl_frontend/settings_page.dart';
 import 'package:wppl_frontend/salary.dart';
 import 'package:wppl_frontend/boss_permission.dart';
@@ -15,6 +18,8 @@ class History extends StatefulWidget {
 
 class HistoryState extends State<History> {
   int _selectedTabIndex = 0;
+  final ApiRoutes _apiRoutes = ApiRoutes();
+
   void _onNavBarTapped(int index) {
     setState(() {
       _selectedTabIndex = index;
@@ -27,39 +32,11 @@ class HistoryState extends State<History> {
     final ButtonStyle style = ElevatedButton.styleFrom(
       textStyle: const TextStyle(fontSize: 20),
     );
-    final _listPage = <Widget>[
-      // Program untuk halaman ditulis di dalam sini
-      Container(
-        padding: EdgeInsets.only(left: 16, top: 25, right: 16),
-        child: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-          },
-          child: ListView(
-            children: [
-              SizedBox(
-                height: 15,
-              ),
-              Center(
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 310,
-                      height: 130,
-                      child: Image.asset("assets/images/logo3.jpg"),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ];
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xff278cbd),
-        title: Text(
+        backgroundColor: const Color(0xff278cbd),
+        title: const Text(
           'Histori Presensi',
           style: TextStyle(
             fontFamily: 'ABZReg',
@@ -69,84 +46,61 @@ class HistoryState extends State<History> {
           ),
         ),
       ),
-      body: Center(child: _listPage[_selectedTabIndex]),
+      body: Center(
+        child: Container(
+          padding: const EdgeInsets.only(left: 16, top: 25, right: 16),
+          child: FutureBuilder(
+            future: _apiRoutes.getHistoryAbsen(context,
+                '2022-05-26'), // a previously-obtained Future<String> or null
+            builder: (BuildContext context,
+                AsyncSnapshot<List<MHistori>?> snapshot) {
+              if (snapshot.hasError) {
+                return const Text("Gagal mengambil");
+              } else if (snapshot.connectionState == ConnectionState.done) {
+                List<MHistori>? finalData = snapshot.data;
+                return _buildListHistori(finalData ?? []);
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
+        ),
+      ),
       //drawer: _buildDrawer(),
     );
   }
 
-  Widget _buildDrawer() {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width / 1.2,
-      child: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              child: Row(
-                children: <Widget>[
-                  CircleAvatar(
-                    radius: 56,
-                    backgroundColor: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(4), // Border radius
-                      child: ClipOval(
-                          child: Image.asset("assets/images/profile.jpg")),
+  Widget _buildListHistori(List<MHistori> myData) {
+    return myData.isNotEmpty
+        ? ListView.builder(
+            primary: false,
+            shrinkWrap: false,
+            itemBuilder: (context, index) {
+              MHistori? data = myData[index];
+              return Card(
+                child: Column(
+                  children: [
+                    Text(data.tanggal!),
+                    CachedNetworkImage(
+                      imageUrl: data.fotoMsk!,
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
                     ),
-                  ),
-                  VerticalDivider(
-                    color: Color(0xff278cbd),
-                    thickness: 25.0,
-                  ),
-                  Text(
-                    'Borneo\nSatria\nPratama',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'ABZReg'),
-                  ),
-                ],
-              ),
-              decoration: BoxDecoration(
-                color: Color(0xff278cbd),
-              ),
-            ),
-            _buildListTile(Icons.house_rounded, "Beranda", null, HomePage()),
-            _buildListTile(Icons.perm_contact_calendar_rounded,
-                "Histori Presensi", null, History()),
-            _buildListTile(Icons.contact_mail_outlined, "Pengajuan Izin", null,
-                BossPermission()),
-            _buildListTile(
-                Icons.monetization_on_outlined, "Slip Gaji", null, Salary()),
-            _buildListTile(Icons.settings, "Pengaturan", null, SettingsPage()),
-            Divider(
-              height: 20.0,
-            ),
-            _buildListTile(null, "Logout", Icons.input, SettingsPage()),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildListTile(
-    IconData? iconLeading,
-    String title,
-    IconData? iconTrailing,
-    Widget PindahYuk,
-  ) {
-    return ListTile(
-      leading: Icon(iconLeading),
-      title: Text(title),
-      trailing: Icon(iconTrailing),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PindahYuk,
-          ),
-        );
-      },
-    );
+                    // Image.network(
+                    //   data.fotoMsk!,
+                    //   errorBuilder: (context, error, stackTrace) {
+                    //     return const Text('Gambar tidak ditemukan...');
+                    //   },
+                    // ),
+                  ],
+                ),
+              );
+            },
+            itemCount: myData.length,
+          )
+        : const Text("Kosong!");
   }
 }

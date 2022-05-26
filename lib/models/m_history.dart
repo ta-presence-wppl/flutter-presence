@@ -1,15 +1,42 @@
-class MResponse {
-  String? responseMessage;
+import 'dart:convert';
 
-  MResponse({
-    this.responseMessage,
+class MHistori {
+  String? tanggal;
+  String? jamMsk;
+  String? fotoMsk;
+  bool? statusMsk;
+  String? jamPlg;
+  bool? statusPlg;
+  String? fotoPlg;
+
+  MHistori({
+    this.tanggal,
+    this.jamMsk,
+    this.fotoMsk,
+    this.statusMsk,
+    this.jamPlg,
+    this.statusPlg,
+    this.fotoPlg,
   });
 
-  factory MResponse.fromJson(Map<String, dynamic> map) {
-    return MResponse(responseMessage: map["message"]);
+  factory MHistori.fromJson(Map<String, dynamic> map) {
+    return MHistori(
+      tanggal: map["tanggal"],
+      jamMsk: map["jam_msk"],
+      fotoMsk: map["foto_msk"],
+      statusMsk: map["false"],
+      jamPlg: map["jam_plg"],
+      statusPlg: map["status_plg"],
+      fotoPlg: map["foto_plg"] ?? '',
+    );
   }
 }
 
-responseData(Map<String, dynamic> jsonData) {
-  return MResponse.fromJson(jsonData);
+responseHistori(String? jsonData) {
+  final data = json.decode(jsonData!)["data"];
+  return List<MHistori>.from(
+    data.map(
+      (item) => MHistori.fromJson(item),
+    ),
+  );
 }

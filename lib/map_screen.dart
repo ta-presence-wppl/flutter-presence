@@ -24,8 +24,6 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void getLocation() async {
-    var location = await currentLocation.getLocation();
-    print(location);
     currentLocation.onLocationChanged.listen((LocationData loc) {
       _controller?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         target: LatLng(loc.latitude ?? 0.0, loc.longitude ?? 0.0),
