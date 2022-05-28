@@ -12,7 +12,6 @@ class Salary extends StatefulWidget {
     return SalaryState();
   }
 }
-
 class SalaryState extends State<Salary> {
   int _selectedTabIndex = 0;
   void _onNavBarTapped(int index) {
@@ -46,54 +45,119 @@ class SalaryState extends State<Salary> {
                     Container(
                       width: 310,
                       height: 130,
-                      child: Image.asset("assets/images/logo3.jpg"),
+                      child: Image.asset("assets/images/logo4.jpg"),
                     ),
                   ],
                 ),
               ),
               SizedBox(
-                height: 35,
+                height: 25,
               ),
-              //Isi program untuk menampilkan kalender dan teks disini
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [DataTable(
+                    headingRowColor: MaterialStateColor.resolveWith((states) => Color(0xff278cbd)),
+                    columns: [
+                    DataColumn(
+                      label:Center(
+                        child:Text('Bulan',
+                        style: TextStyle(
+                          color:Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily:'ABZReg'
+                        ),
+                    ),),),
+                    DataColumn(
+                      label:Center(
+                        child:Text('Unduh!',
+                          style: TextStyle(
+                              color:Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              fontFamily:'ABZReg'
+                          ),
+                      ),),),
+                  ],
+                  rows: [
+                    DataRow(cells: [
+                      DataCell(Text('Mei 2022',
+                        style: TextStyle(
+                            color:Colors.black,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            fontFamily:'ABZReg'
+                        ),),),
+                      DataCell(Center(child:
+                        Icon(Icons.download_rounded, size: 32, color: Color(0xff278cbd),),
+                      ),)
+                    ],),
+                    DataRow(cells: [
+                      DataCell(Text('April 2022',
+                        style: TextStyle(
+                            color:Colors.black,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            fontFamily:'ABZReg'
+                        ),),),
+                      DataCell(Center(child:
+                      Icon(Icons.download_rounded, size: 32, color: Color(0xff278cbd),),
+                      ),)
+                    ],),
+                    DataRow(cells: [
+                      DataCell(Text('Maret 2022',
+                        style: TextStyle(
+                            color:Colors.black,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            fontFamily:'ABZReg'
+                        ),),),
+                      DataCell(Center(child:
+                      Icon(Icons.download_rounded, size: 32, color: Color(0xff278cbd),),
+                      ),)
+                    ],),
+                    DataRow(cells: [
+                      DataCell(Text('Februari 2022',
+                        style: TextStyle(
+                            color:Colors.black,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            fontFamily:'ABZReg'
+                        ),),),
+                      DataCell(Center(child:
+                      Icon(Icons.download_rounded, size: 32, color: Color(0xff278cbd),),
+                      ),)
+                    ],),
+                    DataRow(cells: [
+                      DataCell(Text('Januari 2022',
+                        style: TextStyle(
+                            color:Colors.black,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            fontFamily:'ABZReg'
+                        ),),),
+                      DataCell(Center(child:
+                      Icon(Icons.download_rounded, size: 32, color: Color(0xff278cbd),),
+                      ),)
+                    ],),
+                    DataRow(cells: [
+                    DataCell(Text('Desember 2021',
+                        style: TextStyle(
+                        color:Colors.black,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        fontFamily:'ABZReg'
+                      ),),),
+                      DataCell(Center(child:
+                        Icon(Icons.download_rounded, size: 32, color: Color(0xff278cbd),),
+                      ),)
+                    ],),
+                ]),],
+              ),
               SizedBox(
                 height: 35,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    // padding: EdgeInsets.symmetric(horizontal: 60),
-                    // shape: RoundedRectangleBorder(
-                    //     borderRadius: BorderRadius.circular(20)),
-                    // color: Colors.red,
-                    onPressed: () {},
-                    child: Text("BATAL",
-                        style: TextStyle(
-                            fontSize: 16,
-                            letterSpacing: 2.2,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'ABZReg',
-                            color: Colors.white)),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    // color: Colors.green,
-                    // padding: EdgeInsets.symmetric(horizontal: 60),
-                    // elevation: 2,
-                    // shape: RoundedRectangleBorder(
-                    //     borderRadius: BorderRadius.circular(20)),
-                    child: Text(
-                      "Ajukan",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'ABZReg',
-                          fontSize: 16,
-                          letterSpacing: 2.2,
-                          color: Colors.white),
-                    ),
-                  )
-                ],
-              )
             ],
           ),
         ),
@@ -101,9 +165,8 @@ class SalaryState extends State<Salary> {
     ];
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xff278cbd),
-        title: Text(
-          'PENGATURAN',
+        backgroundColor:Color(0xff278cbd),
+        title: Text('SLIP GAJI',
           style: TextStyle(
             fontFamily: 'ABZReg',
             color: Colors.white,
