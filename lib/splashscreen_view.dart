@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wppl_frontend/home_page.dart';
 import 'package:wppl_frontend/login_view.dart';
 import 'dart:async';
 
@@ -16,13 +18,27 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
 
   startSplashScreen() async {
     var duration = const Duration(seconds: 3);
-    return Timer(duration, () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_){
-          return LoginPage();
-        }),
-      );
-    });
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? userId = prefs.getString('nama');
+    final String? levelUser = prefs.getString('level_user');
+
+    if (userId != null) {
+      return Timer(duration, () {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) {
+            return HomePage();
+          }),
+        );
+      });
+    } else {
+      return Timer(duration, () {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) {
+            return LoginPage();
+          }),
+        );
+      });
+    }
   }
 
   @override

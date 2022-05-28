@@ -14,15 +14,18 @@ class Salary extends StatefulWidget {
 }
 class SalaryState extends State<Salary> {
   int _selectedTabIndex = 0;
-  void _onNavBarTapped(int index){
-    setState((){
+  void _onNavBarTapped(int index) {
+    setState(() {
       _selectedTabIndex = index;
     });
   }
+
   bool showPassword = false;
   @override
   Widget build(BuildContext context) {
-    final ButtonStyle style = ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20),);
+    final ButtonStyle style = ElevatedButton.styleFrom(
+      textStyle: const TextStyle(fontSize: 20),
+    );
     final _listPage = <Widget>[
       // Program untuk halaman ditulis di dalam sini
       Container(
@@ -165,60 +168,62 @@ class SalaryState extends State<Salary> {
         backgroundColor:Color(0xff278cbd),
         title: Text('SLIP GAJI',
           style: TextStyle(
-            fontFamily:'ABZReg',
-            color:Colors.white,
-            fontSize: 22  ,
-            fontWeight: FontWeight.bold,),
+            fontFamily: 'ABZReg',
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-      body:
-      Center(
-          child: _listPage[_selectedTabIndex]
-      ),
-      drawer: _buildDrawer(),
-
+      body: Center(child: _listPage[_selectedTabIndex]),
+      //drawer: _buildDrawer(),
     );
   }
 
   Widget _buildDrawer() {
     return SizedBox(
-      width: MediaQuery.of(context).size.width/1.2,
+      width: MediaQuery.of(context).size.width / 1.2,
       child: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
-          children:[
+          children: [
             DrawerHeader(
-              child: Row(children:<Widget>[
-                CircleAvatar(
-                  radius: 56,
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.all(4), // Border radius
-                    child: ClipOval(child: Image.asset("assets/images/profile.jpg")),
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    radius: 56,
+                    backgroundColor: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(4), // Border radius
+                      child: ClipOval(
+                          child: Image.asset("assets/images/profile.jpg")),
+                    ),
                   ),
-                ),
-                VerticalDivider(
-                  color: Color(0xff278cbd),
-                  thickness: 25.0,
-                ),
-                Text('Borneo\nSatria\nPratama',
-                  style: TextStyle(
-                      color:Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:'ABZReg'
+                  VerticalDivider(
+                    color: Color(0xff278cbd),
+                    thickness: 25.0,
                   ),
-                ),
-              ],),
-              decoration:BoxDecoration(
-                color:Color(0xff278cbd),
+                  Text(
+                    'Borneo\nSatria\nPratama',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'ABZReg'),
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Color(0xff278cbd),
               ),
             ),
-
             _buildListTile(Icons.house_rounded, "Beranda", null, HomePage()),
-            _buildListTile(Icons.perm_contact_calendar_rounded, "Histori Presensi", null, History()),
-            _buildListTile(Icons.contact_mail_outlined, "Pengajuan Izin", null, BossPermission()),
-            _buildListTile(Icons.monetization_on_outlined, "Slip Gaji", null, Salary()),
+            _buildListTile(Icons.perm_contact_calendar_rounded,
+                "Histori Presensi", null, History()),
+            _buildListTile(Icons.contact_mail_outlined, "Pengajuan Izin", null,
+                BossPermission()),
+            _buildListTile(
+                Icons.monetization_on_outlined, "Slip Gaji", null, Salary()),
             _buildListTile(Icons.settings, "Pengaturan", null, SettingsPage()),
             Divider(
               height: 20.0,
@@ -231,11 +236,11 @@ class SalaryState extends State<Salary> {
   }
 
   Widget _buildListTile(
-      IconData? iconLeading,
-      String title,
-      IconData? iconTrailing,
-      Widget PindahYuk,
-      ) {
+    IconData? iconLeading,
+    String title,
+    IconData? iconTrailing,
+    Widget PindahYuk,
+  ) {
     return ListTile(
       leading: Icon(iconLeading),
       title: Text(title),
