@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/icon_data.dart';
 import 'package:wppl_frontend/home_page.dart';
 import 'package:wppl_frontend/settings_page.dart';
 import 'package:wppl_frontend/history.dart';
@@ -16,7 +14,7 @@ class BossPermission extends StatefulWidget {
 
 class BossPermissionState extends State<BossPermission> {
   String? _valPerm;
-  List _listPerm = [
+  final List _listPerm = [
     "Sakit",
     "Izin",
   ];
@@ -25,26 +23,25 @@ class BossPermissionState extends State<BossPermission> {
   TextEditingController alasanController = TextEditingController();
   String alasan = '';
   bool showPassword = false;
-  int _selectedTabIndex = 0;
   @override
   void initState() {
     dateinputStart.text = "";
-    dateinputEnd.text = "";//set the initial value of text field
+    dateinputEnd.text = ""; //set the initial value of text field
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    final ButtonStyle style = ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20),);
     final _listPage = <Widget>[
       Container(
-        padding: EdgeInsets.only(left: 16, top: 25, right: 16),
+        padding: const EdgeInsets.only(left: 16, top: 25, right: 16),
         child: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
           },
           child: ListView(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               Center(
@@ -54,89 +51,103 @@ class BossPermissionState extends State<BossPermission> {
                       width: 310,
                       height: 130,
                       child: Image.asset("assets/images/logo3.jpg"),
-                      ),
+                    ),
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 35,
               ),
               Column(
                 children: [
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Color(0xff278cbd),
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(10.0)),
-                  ),
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    selectedItemBuilder: (BuildContext context) {
-                      return _listPerm.map((value) {
-                        return Text(value,
-                          style: TextStyle(
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: const BoxDecoration(
+                      color: Color(0xff278cbd),
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      selectedItemBuilder: (BuildContext context) {
+                        return _listPerm.map((value) {
+                          return Text(
+                            value,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'ABZReg',
+                            ),
+                          );
+                        }).toList();
+                      },
+                      hint: const Text(
+                        "Pilih jenis pengajuan!",
+                        style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            fontFamily:'ABZReg',
-                          ),);
-                      }).toList();
-                    },
-                    hint: Text("Pilih jenis pengajuan!",
-                      style: TextStyle(
-                          color:Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontFamily:'ABZReg'
-                      ),),
-                    icon: const Icon(Icons.arrow_drop_down_sharp, color:Colors.white,),
-                    value: _valPerm,
-                    underline: Container(
-                      height: 3,
-                      color: Colors.white,
+                            fontFamily: 'ABZReg'),
+                      ),
+                      icon: const Icon(
+                        Icons.arrow_drop_down_sharp,
+                        color: Colors.white,
+                      ),
+                      value: _valPerm,
+                      underline: Container(
+                        height: 3,
+                        color: Colors.white,
+                      ),
+                      items: _listPerm.map((value) {
+                        return DropdownMenuItem<String>(
+                          child: Text(
+                            value,
+                            style: const TextStyle(
+                                color: Color(0xff278cbd),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'ABZReg'),
+                          ),
+                          value: value,
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _valPerm =
+                              value; //Untuk memberitahu _valGender bahwa isi nya akan diubah sesuai dengan value yang kita pilih
+                        });
+                      },
                     ),
-                    items: _listPerm.map((value) {
-                      return DropdownMenuItem<String>(
-                        child: Text(value, style: TextStyle(
-                            color: Color(0xff278cbd),
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontFamily:'ABZReg'
-                        ),),
-                        value: value,
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _valPerm = value;  //Untuk memberitahu _valGender bahwa isi nya akan diubah sesuai dengan value yang kita pilih
-                      });
-                    },
-                  ),),
-                  SizedBox(
+                  ),
+                  const SizedBox(
                     height: 15,
                   ),
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Color(0xff278cbd),
-                      borderRadius: BorderRadius.all(
-                          Radius.circular(10.0)),
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     ),
                     child: TextField(
                       controller: alasanController,
-                      style: TextStyle(color:Colors.white, fontSize:20, fontFamily:'ABZReg', fontWeight: FontWeight.bold,),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontFamily: 'ABZReg',
+                        fontWeight: FontWeight.bold,
+                      ),
                       decoration: InputDecoration(
                         hintText: "Sampaikan alasan anda!",
-                        hintStyle: TextStyle(color:Colors.white, fontSize:20),
+                        hintStyle:
+                            const TextStyle(color: Colors.white, fontSize: 20),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color:Color(0xff278cbd), width: 2)
-                        ),
+                            borderSide: const BorderSide(
+                                color: Color(0xff278cbd), width: 2)),
                         focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color:Color(0xff278cbd), width: 2)
-                        ),
-                        fillColor: Color(0xff278cbd),
+                            borderSide: const BorderSide(
+                                color: Color(0xff278cbd), width: 2)),
+                        fillColor: const Color(0xff278cbd),
                         filled: true,
                       ),
                       onChanged: (text) {
@@ -149,137 +160,139 @@ class BossPermissionState extends State<BossPermission> {
                       },
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 15,
                   ),
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Color(0xff278cbd),
-                      borderRadius: BorderRadius.all(
-                          Radius.circular(10.0)),
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     ),
                     child: TextField(
-                      style: TextStyle(color:Colors.white, fontSize:20, fontFamily:'ABZReg', fontWeight: FontWeight.bold,),
-                      decoration: InputDecoration(
-                        hintText: "Pilih tanggal mulai izin!",
-                        hintStyle: TextStyle(color:Colors.white, fontSize:20),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color:Color(0xff278cbd), width: 2)
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontFamily: 'ABZReg',
+                          fontWeight: FontWeight.bold,
                         ),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color:Color(0xff278cbd), width: 2)
-                        ),
-                        fillColor: Color(0xff278cbd),
-                        filled: true,
-                      ),
-                      controller: dateinputStart,
-                      onTap: () async {
-                        FocusScope.of(context).requestFocus(new FocusNode());
-                        DateTime? pickedDate = await showDatePicker(
-                          context: context, initialDate: DateTime.now(),
-                          firstDate: DateTime(2000), //DateTime.now() - not to allow to choose before today.
-                          lastDate: DateTime(2101)
-                        );
-                        if(pickedDate != null ){
-                          print(pickedDate);  //pickedDate output format => 2021-03-10 00:00:00.000
-                          String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-                          print(formattedDate);//formatted date output using intl package =>  2021-03-16
-                        //you can implement different kind of Date Format here according to your requirement
-                        setState(() {
-                          dateinputStart.text = formattedDate; //set output date to TextField value.
-                          });
-                        }else{
-                          print("Tanggal belum dipilih");
-                        }
-                      }
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xff278cbd),
-                      borderRadius: BorderRadius.all(
-                          Radius.circular(10.0)),
-                    ),
-                    child: TextField(
-                        style: TextStyle(color:Colors.white, fontSize:20, fontFamily:'ABZReg', fontWeight: FontWeight.bold,),
                         decoration: InputDecoration(
-                          hintText: "Pilih tanggal selesai izin!",
-                          hintStyle: TextStyle(color:Colors.white, fontSize:20),
+                          hintText: "Pilih tanggal mulai izin!",
+                          hintStyle: const TextStyle(
+                              color: Colors.white, fontSize: 20),
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color:Color(0xff278cbd), width: 2)
-                          ),
+                              borderSide: const BorderSide(
+                                  color: Color(0xff278cbd), width: 2)),
                           focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color:Color(0xff278cbd), width: 2)
-                          ),
+                              borderSide: const BorderSide(
+                                  color: Color(0xff278cbd), width: 2)),
                           fillColor: Color(0xff278cbd),
+                          filled: true,
+                        ),
+                        controller: dateinputStart,
+                        onTap: () async {
+                          FocusScope.of(context).requestFocus(new FocusNode());
+                          DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(
+                                  2000), //DateTime.now() - not to allow to choose before today.
+                              lastDate: DateTime(2101));
+                          if (pickedDate != null) {
+                            print(
+                                pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                            String formattedDate =
+                                DateFormat('yyyy-MM-dd').format(pickedDate);
+                            print(
+                                formattedDate); //formatted date output using intl package =>  2021-03-16
+                            //you can implement different kind of Date Format here according to your requirement
+                            setState(() {
+                              dateinputStart.text =
+                                  formattedDate; //set output date to TextField value.
+                            });
+                          } else {
+                            print("Tanggal belum dipilih");
+                          }
+                        }),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xff278cbd),
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    child: TextField(
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontFamily: 'ABZReg',
+                          fontWeight: FontWeight.bold,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: "Pilih tanggal selesai izin!",
+                          hintStyle: const TextStyle(
+                              color: Colors.white, fontSize: 20),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(
+                                  color: Color(0xff278cbd), width: 2)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(
+                                  color: Color(0xff278cbd), width: 2)),
+                          fillColor: const Color(0xff278cbd),
                           filled: true,
                         ),
                         controller: dateinputEnd,
                         onTap: () async {
                           FocusScope.of(context).requestFocus(new FocusNode());
                           DateTime? pickedDate = await showDatePicker(
-                              context: context, initialDate: DateTime.now(),
-                              firstDate: DateTime(2000), //DateTime.now() - not to allow to choose before today.
-                              lastDate: DateTime(2101)
-                          );
-                          if(pickedDate != null ){
-                            print(pickedDate);  //pickedDate output format => 2021-03-10 00:00:00.000
-                            String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-                            print(formattedDate);//formatted date output using intl package =>  2021-03-16
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(
+                                  2000), //DateTime.now() - not to allow to choose before today.
+                              lastDate: DateTime(2101));
+                          if (pickedDate != null) {
+                            print(
+                                pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                            String formattedDate =
+                                DateFormat('yyyy-MM-dd').format(pickedDate);
+                            print(
+                                formattedDate); //formatted date output using intl package =>  2021-03-16
                             //you can implement different kind of Date Format here according to your requirement
                             setState(() {
-                              dateinputEnd.text = formattedDate; //set output date to TextField value.
+                              dateinputEnd.text =
+                                  formattedDate; //set output date to TextField value.
                             });
-                          }else{
+                          } else {
                             print("Tanggal belum dipilih");
                           }
-                        }
-                    ),
+                        }),
                   ),
-                  SizedBox(
-                    height: 15,
+                  const SizedBox(
+                    height: 25,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      RaisedButton(
-                        padding: EdgeInsets.symmetric(horizontal: 60),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        color: Colors.red,
-                        onPressed: () {},
-                        child: Text("BATAL",
-                            style: TextStyle(
-                                fontSize: 16,
-                                letterSpacing: 2.2,
-                                fontWeight: FontWeight.bold,
-                                fontFamily:'ABZReg',
-                                color: Colors.white)),
-                      ),
-                      RaisedButton(
-                        onPressed: () {},
-                        color: Colors.green,
-                        padding: EdgeInsets.symmetric(horizontal: 60),
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Text(
-                          "SIMPAN",
+                      ElevatedButton(
+                        child: const Text(
+                          "Ajukan",
                           style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontFamily:'ABZReg',
-                              fontSize: 16,
-                              letterSpacing: 2.2,
-                              color: Colors.white),
+                            fontSize: 16,
+                          ),
                         ),
-                      )
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          primary: Colors.green,
+                        ),
+                      ),
                     ],
                   )
                 ],
@@ -291,92 +304,18 @@ class BossPermissionState extends State<BossPermission> {
     ];
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:Color(0xff278cbd),
-        title: Text('PENGAJUAN IZIN',
+        backgroundColor: const Color(0xff278cbd),
+        title: const Text(
+          'Pengajuan Izin',
           style: TextStyle(
-            fontFamily:'ABZReg',
-            color:Colors.white,
-            fontSize: 22  ,
-            fontWeight: FontWeight.bold,),
-        ),
-      ),
-      body:
-      Center(
-          child: _listPage[_selectedTabIndex]
-      ),
-      drawer: _buildDrawer(),
-
-    );
-  }
-
-  Widget _buildDrawer() {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width/1.2,
-      child: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children:[
-            DrawerHeader(
-              child: Row(children:<Widget>[
-                CircleAvatar(
-                  radius: 56,
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.all(4), // Border radius
-                    child: ClipOval(child: Image.asset("assets/images/profile.jpg")),
-                  ),
-                ),
-                VerticalDivider(
-                  color: Color(0xff278cbd),
-                  thickness: 25.0,
-                ),
-                Text('Borneo\nSatria\nPratama',
-                  style: TextStyle(
-                      color:Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      fontFamily:'ABZReg'
-                  ),
-                ),
-              ],),
-              decoration:BoxDecoration(
-                color:Color(0xff278cbd),
-              ),
-            ),
-
-            _buildListTile(Icons.house_rounded, "Beranda", null, HomePage()),
-            _buildListTile(Icons.perm_contact_calendar_rounded, "Histori Presensi", null, History()),
-            _buildListTile(Icons.contact_mail_outlined, "Pengajuan Izin", null, BossPermission()),
-            _buildListTile(Icons.monetization_on_outlined, "Slip Gaji", null, Salary()),
-            _buildListTile(Icons.settings, "Pengaturan", null, SettingsPage()),
-            Divider(
-              height: 20.0,
-            ),
-            _buildListTile(null, "Logout", Icons.input, SettingsPage()),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildListTile(
-      IconData? iconLeading,
-      String title,
-      IconData? iconTrailing,
-      Widget PindahYuk,
-      ) {
-    return ListTile(
-      leading: Icon(iconLeading),
-      title: Text(title),
-      trailing: Icon(iconTrailing),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PindahYuk,
+            fontFamily: 'ABZReg',
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
-        );
-      },
+        ),
+      ),
+      body: Center(child: _listPage[0]),
     );
   }
 }

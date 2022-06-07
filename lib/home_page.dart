@@ -64,6 +64,7 @@ class HomePageState extends State<HomePage> {
             .absentIN(File(choosedimage.path), _latitude, _longitude)
             .then(
               (value) => {
+                getInfo(),
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(value!.responseMessage!),
@@ -86,6 +87,7 @@ class HomePageState extends State<HomePage> {
             .absentOut(File(choosedimage.path), _latitude, _longitude)
             .then(
               (value) => {
+                getInfo(),
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(value!.responseMessage!),
@@ -101,6 +103,7 @@ class HomePageState extends State<HomePage> {
 
   void getInfo() async {
     await _apiRoutes.getAbsenStatus(context).then((_user) {
+      print(_user);
       _statusAbsent = _user!.responseMessage;
     });
   }
@@ -118,18 +121,16 @@ class HomePageState extends State<HomePage> {
         children: <Widget>[
           const SizedBox(height: 10),
           Container(
-            width: 390,
+            width: MediaQuery.of(context).size.width,
             child: Text(
-              '             Tanggal  :  ' +
-                  formattedDate +
-                  ' \n                 Pukul  :  ' +
-                  formattedHour,
+              formattedDate + '\n' + formattedHour,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20.0,
                 fontFamily: 'ABZReg',
                 color: Color(0xff278cbd),
               ),
+              textAlign: TextAlign.center,
             ),
             margin: const EdgeInsets.all(5.0),
             padding: const EdgeInsets.all(10.0),
@@ -149,7 +150,7 @@ class HomePageState extends State<HomePage> {
                 label: const Text(
                   "Presensi Masuk",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                   ),
                 ),
                 onPressed: () {
@@ -168,7 +169,7 @@ class HomePageState extends State<HomePage> {
                 label: const Text(
                   "Presensi Pulang",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                   ),
                 ),
                 onPressed: () {
@@ -223,18 +224,16 @@ class HomePageState extends State<HomePage> {
         children: <Widget>[
           const SizedBox(height: 10),
           Container(
-            width: 390,
+            width: MediaQuery.of(context).size.width,
             child: Text(
-              '             Tanggal  :  ' +
-                  formattedDate +
-                  ' \n                 Pukul  :  ' +
-                  formattedHour,
+              formattedDate + '\n' + formattedHour,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20.0,
                 fontFamily: 'ABZReg',
                 color: Color(0xff278cbd),
               ),
+              textAlign: TextAlign.center,
             ),
             margin: const EdgeInsets.all(5.0),
             padding: const EdgeInsets.all(10.0),
@@ -345,7 +344,7 @@ class HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: const Color(0xff278cbd),
         title: const Text(
-          'BERANDA',
+          'Beranda',
           style: TextStyle(
             fontFamily: 'ABZReg',
             color: Colors.white,
