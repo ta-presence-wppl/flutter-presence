@@ -2,7 +2,7 @@
     package="com.example.wppl_frontend">
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="wppl_frontend"
+        android:label="Presensi WPPL"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         
