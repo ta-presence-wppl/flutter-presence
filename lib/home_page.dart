@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wppl_frontend/api/api_routes.dart';
+import 'package:wppl_frontend/login_view.dart';
 import 'package:wppl_frontend/map_screen.dart';
 import 'package:wppl_frontend/settings_page.dart';
 import 'package:wppl_frontend/boss_permission.dart';
@@ -12,9 +13,7 @@ import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return HomePageState();
-  }
+  State<StatefulWidget> createState() => HomePageState();
 }
 
 class HomePageState extends State<HomePage> {
@@ -24,16 +23,17 @@ class HomePageState extends State<HomePage> {
   final picker = ImagePicker();
   File? uploadimage;
   final ApiRoutes _apiRoutes = ApiRoutes();
-  String? _latitude, _longitude, _statusAbsent = "";
+  String? _latitude, _longitude;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
     super.initState();
     getLatLong();
-    getInfo();
   }
 
-  void getLatLong() async {
+  Future<void> getLatLong() async {
     currentLocation.onLocationChanged.listen((LocationData loc) {
       setState(() {
         _latitude = loc.latitude.toString();
@@ -53,6 +53,10 @@ class HomePageState extends State<HomePage> {
     setState(() {
       _selectedTabIndex = index;
     });
+  }
+
+  Future<void> _refresh() async {
+    setState(() {});
   }
 
   void chooseImage() async {
@@ -101,11 +105,24 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  void getInfo() async {
-    await _apiRoutes.getAbsenStatus(context).then((_user) {
-      print(_user);
-      _statusAbsent = _user!.responseMessage;
+  Future<String> getInfo() async {
+    String? res = await _apiRoutes.getAbsenStatus(context).then((_user) {
+      return _user!.responseMessage;
     });
+    return res!;
+  }
+
+  Future<Null> logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -186,18 +203,45 @@ class HomePageState extends State<HomePage> {
             ],
           ),
           Container(
-            child: Text(
-              _statusAbsent!,
-              textAlign: TextAlign.left,
-              style: const TextStyle(
-                color: Color.fromARGB(255, 35, 141, 9),
-                fontWeight: FontWeight.bold,
-                fontFamily: 'ABZReg',
-                fontSize: 14,
-              ),
+            child: FutureBuilder<String>(
+              future: getInfo(),
+              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return const CircularProgressIndicator();
+                  default:
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return Text(
+                        '${snapshot.data}',
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(
+                          color: Color.fromARGB(255, 35, 141, 9),
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'ABZReg',
+                          fontSize: 14,
+                        ),
+                      );
+                    }
+                }
+              },
             ),
             margin: const EdgeInsets.all(16.0),
           ),
+          // Container(
+          //   child: Text(
+          //     _statusAbsent!,
+          //     textAlign: TextAlign.left,
+          //     style: const TextStyle(
+          //       color: Color.fromARGB(255, 35, 141, 9),
+          //       fontWeight: FontWeight.bold,
+          //       fontFamily: 'ABZReg',
+          //       fontSize: 14,
+          //     ),
+          //   ),
+          //   margin: const EdgeInsets.all(16.0),
+          // ),
           Container(
             child: const Text(
               "Lokasi WFH anda saat ini:",
@@ -284,19 +328,19 @@ class HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
             ],
           ),
-          Container(
-            child: Text(
-              _statusAbsent!,
-              textAlign: TextAlign.left,
-              style: const TextStyle(
-                color: Color.fromARGB(255, 35, 141, 9),
-                fontWeight: FontWeight.bold,
-                fontFamily: 'ABZReg',
-                fontSize: 14,
-              ),
-            ),
-            margin: const EdgeInsets.all(16.0),
-          ),
+          // Container(
+          //   child: Text(
+          //     _statusAbsent!,
+          //     textAlign: TextAlign.left,
+          //     style: const TextStyle(
+          //       color: Color.fromARGB(255, 35, 141, 9),
+          //       fontWeight: FontWeight.bold,
+          //       fontFamily: 'ABZReg',
+          //       fontSize: 14,
+          //     ),
+          //   ),
+          //   margin: const EdgeInsets.all(16.0),
+          // ),
           Container(
             child: const Text(
               "Lokasi WFO anda saat ini:",
@@ -353,7 +397,18 @@ class HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: Center(child: _listPage[_selectedTabIndex]),
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _refresh,
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Stack(children: <Widget>[
+            ListView(
+                physics: const AlwaysScrollableScrollPhysics(), children: []),
+            _listPage[_selectedTabIndex],
+          ]),
+        ),
+      ),
       drawer: _buildDrawer(),
       bottomNavigationBar: _bottomNavBar,
     );
@@ -375,21 +430,13 @@ class HomePageState extends State<HomePage> {
                     child: Padding(
                       padding: const EdgeInsets.all(4), // Border radius
                       child: ClipOval(
-                          child: Image.asset("assets/images/profile.jpg")),
+                          child: Image.asset("assets/images/profile-2.png")),
                     ),
                   ),
                   const VerticalDivider(
                     color: Color(0xff278cbd),
                     thickness: 25.0,
                   ),
-                  // Text(
-                  //   'Borneo\nSatria\nPratama',
-                  //   style: TextStyle(
-                  //       color: Colors.white,
-                  //       fontSize: 22,
-                  //       fontWeight: FontWeight.bold,
-                  //       fontFamily: 'ABZReg'),
-                  // ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,10 +447,20 @@ class HomePageState extends State<HomePage> {
                         builder: (BuildContext context,
                             AsyncSnapshot<String> snapshot) {
                           if (snapshot.hasData) {
-                            return Text('' + snapshot.data!);
+                            return Text(
+                              '' + snapshot.data!,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'ABZReg'),
+                            );
                           }
                           return const Text('Gagal');
                         },
+                      ),
+                      const SizedBox(
+                        height: 15,
                       ),
                       FutureBuilder<String>(
                         future: getShared(
@@ -411,7 +468,14 @@ class HomePageState extends State<HomePage> {
                         builder: (BuildContext context,
                             AsyncSnapshot<String> snapshot) {
                           if (snapshot.hasData) {
-                            return Text('' + snapshot.data!);
+                            return Text(
+                              '' + snapshot.data!,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'ABZReg'),
+                            );
                           }
                           return const Text('Gagal');
                         },
@@ -435,7 +499,17 @@ class HomePageState extends State<HomePage> {
             const Divider(
               height: 20.0,
             ),
-            _buildListTile(null, "Logout", Icons.input, ''),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.grey, size: 25),
+              title: const Text(
+                'Logout',
+                style: TextStyle(fontFamily: 'Montserrat'),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                logout();
+              },
+            ),
           ],
         ),
       ),

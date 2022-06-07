@@ -52,7 +52,8 @@ class SettingsPageState extends State<SettingsPage> {
                         child: Padding(
                           padding: const EdgeInsets.all(4), // Border radius
                           child: ClipOval(
-                              child: Image.asset("assets/images/profile.jpg")),
+                              child:
+                                  Image.asset("assets/images/profile-2.png")),
                         ),
                       ),
                     ),
