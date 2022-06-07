@@ -133,8 +133,8 @@ class ApiRoutes {
       dioRequest.options.headers = {'Authorization': token};
 
       ///[3] SEND TO SERVER
-      Response<String> response = await dioRequest
-          .get('/absent_service/absent/history?date=2022-05-26');
+      Response<String> response =
+          await dioRequest.get('/absent_service/absent/history?date=' + myDate);
       return responseHistori(response.data);
       print('tes');
     } catch (err) {

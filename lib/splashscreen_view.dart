@@ -17,7 +17,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   }
 
   startSplashScreen() async {
-    var duration = const Duration(seconds: 3);
+    var duration = const Duration(seconds: 2);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? userId = prefs.getString('nama');
     final String? levelUser = prefs.getString('level_user');
