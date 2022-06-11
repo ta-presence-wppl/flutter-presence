@@ -54,6 +54,9 @@ class HistoryState extends State<History> {
 
   String _parseTime(String _myDate) {
     var inputFormat = DateFormat('H:m:sz');
+    if (_myDate == '-') {
+      return '-';
+    }
     var inputDate = inputFormat.parse(_myDate); // 20:48:57+07
 
     var outputFormat = DateFormat('H:mm');

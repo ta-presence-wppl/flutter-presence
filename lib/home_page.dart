@@ -26,11 +26,13 @@ class HomePageState extends State<HomePage> {
   String? _latitude, _longitude;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
+  late String? _statusAbsent = '-';
 
   @override
   void initState() {
     super.initState();
     getLatLong();
+    getInfov2();
   }
 
   Future<void> getLatLong() async {
@@ -56,6 +58,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> _refresh() async {
+    getInfov2();
     setState(() {});
   }
 
@@ -110,6 +113,12 @@ class HomePageState extends State<HomePage> {
       return _user!.responseMessage;
     });
     return res!;
+  }
+
+  Future<void> getInfov2() async {
+    String? res = await _apiRoutes.getAbsenStatus(context).then((_user) {
+      _statusAbsent = _user!.responseMessage;
+    });
   }
 
   Future<Null> logout() async {
@@ -202,46 +211,46 @@ class HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
             ],
           ),
-          Container(
-            child: FutureBuilder<String>(
-              future: getInfo(),
-              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return const CircularProgressIndicator();
-                  default:
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      return Text(
-                        '${snapshot.data}',
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(
-                          color: Color.fromARGB(255, 35, 141, 9),
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'ABZReg',
-                          fontSize: 14,
-                        ),
-                      );
-                    }
-                }
-              },
-            ),
-            margin: const EdgeInsets.all(16.0),
-          ),
           // Container(
-          //   child: Text(
-          //     _statusAbsent!,
-          //     textAlign: TextAlign.left,
-          //     style: const TextStyle(
-          //       color: Color.fromARGB(255, 35, 141, 9),
-          //       fontWeight: FontWeight.bold,
-          //       fontFamily: 'ABZReg',
-          //       fontSize: 14,
-          //     ),
+          //   child: FutureBuilder<String>(
+          //     future: getInfo(),
+          //     builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          //       switch (snapshot.connectionState) {
+          //         case ConnectionState.waiting:
+          //           return const CircularProgressIndicator();
+          //         default:
+          //           if (snapshot.hasError) {
+          //             return Text('Error: ${snapshot.error}');
+          //           } else {
+          //             return Text(
+          //               '${snapshot.data}',
+          //               textAlign: TextAlign.left,
+          //               style: const TextStyle(
+          //                 color: Color.fromARGB(255, 35, 141, 9),
+          //                 fontWeight: FontWeight.bold,
+          //                 fontFamily: 'ABZReg',
+          //                 fontSize: 14,
+          //               ),
+          //             );
+          //           }
+          //       }
+          //     },
           //   ),
           //   margin: const EdgeInsets.all(16.0),
           // ),
+          Container(
+            child: Text(
+              _statusAbsent ?? '-',
+              textAlign: TextAlign.left,
+              style: const TextStyle(
+                color: Color.fromARGB(255, 35, 141, 9),
+                fontWeight: FontWeight.bold,
+                fontFamily: 'ABZReg',
+                fontSize: 14,
+              ),
+            ),
+            margin: const EdgeInsets.all(16.0),
+          ),
           Container(
             child: const Text(
               "Lokasi WFH anda saat ini:",
@@ -403,9 +412,9 @@ class HomePageState extends State<HomePage> {
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Stack(children: <Widget>[
-            ListView(
-                physics: const AlwaysScrollableScrollPhysics(), children: []),
-            _listPage[_selectedTabIndex],
+            SingleChildScrollView(
+              child: _listPage[_selectedTabIndex],
+            )
           ]),
         ),
       ),

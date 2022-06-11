@@ -9,7 +9,6 @@ import 'package:wppl_frontend/login_view.dart';
 import 'package:wppl_frontend/salary.dart';
 import 'package:wppl_frontend/settings_page.dart';
 import 'package:wppl_frontend/splashscreen_view.dart';
-import 'package:wppl_frontend/home_page_temp.dart';
 
 void main() {
   HttpOverrides.global = MyHttpOverrides();
