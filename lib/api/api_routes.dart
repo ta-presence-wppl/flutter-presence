@@ -72,7 +72,7 @@ class ApiRoutes {
 
       //[3] ADDING EXTRA INFO
       var formData =
-          dio.FormData.fromMap({'lokasi_msk': '$_latitude, $_longitude'});
+          dio.FormData.fromMap({'lokasi_plg': '$_latitude, $_longitude'});
 
       //[4] ADD IMAGE TO UPLOAD
       var file = await dio.MultipartFile.fromFile(fileImage.path,
