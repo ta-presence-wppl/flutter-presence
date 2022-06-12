@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'package:wppl_frontend/api/api_routes.dart';
 import 'package:wppl_frontend/home_page.dart';
-import 'package:wppl_frontend/home_page_temp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,66 +28,73 @@ class _LoginPage extends State<LoginPage> {
     //insted use your local IP address or use live URL
     //hit "ipconfig" in windows or "ip a" in linux to get you local IP
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    var response = await http.post(Uri.parse(apiurl), body: {
-      'email': 'tes@dev.com', //username, //get the username text
-      'password': 'tes' //password //get password text
-    });
-
-    if (response.statusCode == 200) {
-      var jsondata = json.decode(response.body);
-      setState(() {
-        error = false;
-        showprogress = false;
-      });
-      await prefs.setString('nama', jsondata['data']['nama']);
-      await prefs.setString('email', jsondata['data']['email']);
-      await prefs.setString('jabatan', jsondata['data']['kode_jabatan']);
-      await prefs.setString('token', jsondata['token']);
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) {
-            return HomePage();
-          },
-        ),
-      );
-      //print(jsondata['token']);
-      // if (jsondata["error"]) {
-      //   setState(() {
-      //     showprogress = false; //don't show progress indicator
-      //     error = true;
-      //     errormsg = jsondata["message"];
-      //   });
-      // } else {
-      //   if (jsondata["success"]) {
-      //     setState(() {
-      //       error = false;
-      //       showprogress = false;
-      //     });
-      //     Navigator.of(context).pushReplacement(
-      //       MaterialPageRoute(builder: (_){
-      //         return HomePageTemp();
-      //       }),
-      //     );
-      //   } else {
-      //     showprogress = false; //don't show progress indicator
-      //     error = true;
-      //     errormsg = "Something went wrong.";
-      //   }
-      // }
-    } else if (response.statusCode == 401) {
+    if (username == '' && password == '') {
       setState(() {
         showprogress = false; //don't show progress indicator
         error = true;
-        errormsg = "Mohon Maaf Email atau Password Salah!";
+        errormsg = "Mohon isi email dan password";
       });
     } else {
-      setState(() {
-        showprogress = false; //don't show progress indicator
-        error = true;
-        errormsg = "Kesalahan pada server.";
+      var response = await http.post(Uri.parse(apiurl), body: {
+        'email': username, //'tes@dev.com', //username, //get the username text
+        'password': password, //'tes' //password //get password text
       });
+
+      if (response.statusCode == 200) {
+        var jsondata = json.decode(response.body);
+        setState(() {
+          error = false;
+          showprogress = false;
+        });
+        await prefs.setString('nama', jsondata['data']['nama']);
+        await prefs.setString('email', jsondata['data']['email']);
+        await prefs.setString('jabatan', jsondata['data']['kode_jabatan']);
+        await prefs.setString('token', jsondata['token']);
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) {
+              return HomePage();
+            },
+          ),
+        );
+        //print(jsondata['token']);
+        // if (jsondata["error"]) {
+        //   setState(() {
+        //     showprogress = false; //don't show progress indicator
+        //     error = true;
+        //     errormsg = jsondata["message"];
+        //   });
+        // } else {
+        //   if (jsondata["success"]) {
+        //     setState(() {
+        //       error = false;
+        //       showprogress = false;
+        //     });
+        //     Navigator.of(context).pushReplacement(
+        //       MaterialPageRoute(builder: (_){
+        //         return HomePageTemp();
+        //       }),
+        //     );
+        //   } else {
+        //     showprogress = false; //don't show progress indicator
+        //     error = true;
+        //     errormsg = "Something went wrong.";
+        //   }
+        // }
+      } else if (response.statusCode == 401) {
+        setState(() {
+          showprogress = false; //don't show progress indicator
+          error = true;
+          errormsg = "Mohon Maaf Email atau Password Salah!";
+        });
+      } else {
+        setState(() {
+          showprogress = false; //don't show progress indicator
+          error = true;
+          errormsg = "Kesalahan pada server.";
+        });
+      }
     }
   }
 
@@ -172,20 +177,19 @@ class _LoginPage extends State<LoginPage> {
               margin: const EdgeInsets.only(top: 30),
               padding: const EdgeInsets.all(10),
               child: error ? errmsg(errormsg) : Container(),
-              //if error == true then show error message
-              //else set empty container as child
             ),
             Container(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               margin: const EdgeInsets.only(top: 10),
               child: TextField(
+                keyboardType: TextInputType.emailAddress,
                 controller: _username, //set username controller
                 style: const TextStyle(
                     color: Color(0xff278cbd),
                     fontSize: 20,
                     fontFamily: 'ABZReg'),
                 decoration: myInputDecoration(
-                  label: "Username",
+                  label: "Email",
                   icon: Icons.person,
                 ),
                 onChanged: (value) {
@@ -228,7 +232,7 @@ class _LoginPage extends State<LoginPage> {
                     startLogin();
                   },
                   child: showprogress
-                      ? SizedBox(
+                      ? const SizedBox(
                           height: 30,
                           width: 30,
                           child: CircularProgressIndicator(
@@ -237,7 +241,7 @@ class _LoginPage extends State<LoginPage> {
                                 Color(0xff278cbd)),
                           ),
                         )
-                      : Text(
+                      : const Text(
                           "LOGIN",
                           style: TextStyle(fontSize: 25, fontFamily: 'ABZReg'),
                         ),
@@ -261,27 +265,27 @@ class _LoginPage extends State<LoginPage> {
   InputDecoration myInputDecoration({String? label, IconData? icon}) {
     return InputDecoration(
       hintText: label, //show label as placeholder
-      hintStyle:
-          TextStyle(color: Color(0xff278cbd), fontSize: 20), //hint text style
+      hintStyle: const TextStyle(
+          color: Color(0xff278cbd), fontSize: 20), //hint text style
       prefixIcon: Padding(
-          padding: EdgeInsets.only(left: 20, right: 10),
+          padding: const EdgeInsets.only(left: 20, right: 10),
           child: Icon(
             icon,
-            color: Color(0xff278cbd),
+            color: const Color(0xff278cbd),
           )
           //padding and icon for prefix
           ),
 
-      contentPadding: EdgeInsets.fromLTRB(30, 20, 30, 20),
+      contentPadding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
       enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(35),
-          borderSide: BorderSide(
+          borderSide: const BorderSide(
               color: Color(0xff278cbd), width: 2)), //default border of input
 
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(35),
-          borderSide:
-              BorderSide(color: Color(0xff278cbd), width: 2)), //focus border
+          borderSide: const BorderSide(
+              color: Color(0xff278cbd), width: 2)), //focus border
 
       fillColor: Colors.white,
       filled: true, //set true if you want to show input background
@@ -291,21 +295,26 @@ class _LoginPage extends State<LoginPage> {
   Widget errmsg(String text) {
     //error message widget.
     return Container(
-      padding: EdgeInsets.all(15.00),
-      margin: EdgeInsets.only(bottom: 10.00),
+      padding: const EdgeInsets.all(15.00),
+      margin: const EdgeInsets.only(bottom: 10.00),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
           color: Colors.red,
           border: Border.all(color: Colors.red, width: 2)),
       child: Row(children: <Widget>[
         Container(
-          margin: EdgeInsets.only(right: 6.00),
-          child: Icon(Icons.info, color: Colors.white),
+          margin: const EdgeInsets.only(right: 6.00),
+          child: const Icon(Icons.info, color: Colors.white),
         ), // icon for error message
-
-        Text(text,
-            style: TextStyle(
-                color: Colors.white, fontSize: 18, fontFamily: 'ABZReg')),
+        Flexible(
+          child: Column(
+            children: [
+              Text(text,
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 18, fontFamily: 'ABZReg')),
+            ],
+          ),
+        ),
         //show error message text
       ]),
     );
