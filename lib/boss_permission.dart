@@ -1,9 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:wppl_frontend/home_page.dart';
-import 'package:wppl_frontend/settings_page.dart';
-import 'package:wppl_frontend/history.dart';
-import 'package:wppl_frontend/salary.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:wppl_frontend/api/api_routes.dart';
 
 class BossPermission extends StatefulWidget {
   @override
@@ -14,6 +14,9 @@ class BossPermission extends StatefulWidget {
 
 class BossPermissionState extends State<BossPermission> {
   String? _valPerm;
+  final picker = ImagePicker();
+  final ApiRoutes _apiRoutes = ApiRoutes();
+  File? uploadimage;
   final List _listPerm = [
     "Sakit",
     "Izin",
@@ -23,11 +26,68 @@ class BossPermissionState extends State<BossPermission> {
   TextEditingController alasanController = TextEditingController();
   String alasan = '';
   bool showPassword = false;
+
   @override
   void initState() {
-    dateinputStart.text = "";
-    dateinputEnd.text = ""; //set the initial value of text field
     super.initState();
+    dateinputStart.text = "";
+    dateinputEnd.text = "";
+    uploadimage = null; //set the initial value of text field
+  }
+
+  void chooseImage() async {
+    try {
+      var choosedimage =
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+
+      if (choosedimage != null) {
+        setState(() {
+          uploadimage = File(choosedimage.path);
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gambar tidak dapat diambil!'),
+          ),
+        );
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void sendizin() async {
+    if (uploadimage != null &&
+        _valPerm != '' &&
+        alasanController.text != '' &&
+        dateinputEnd.text != '' &&
+        dateinputStart.text != '') {
+      await _apiRoutes
+          .izinIN(uploadimage!, _valPerm, alasanController.text,
+              dateinputStart.text, dateinputEnd.text)
+          .then(
+            (value) => {
+              setState(() {
+                uploadimage = null;
+                _valPerm = null;
+              }),
+              alasanController.clear(),
+              dateinputStart.clear(),
+              dateinputEnd.clear(),
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(value!.responseMessage!),
+                ),
+              ),
+            },
+          );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Mohon Lengkapi Form Isian!'),
+        ),
+      );
+    }
   }
 
   @override
@@ -84,7 +144,7 @@ class BossPermissionState extends State<BossPermission> {
                       hint: const Text(
                         "Pilih jenis pengajuan!",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: Color.fromARGB(150, 255, 255, 255),
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'ABZReg'),
@@ -125,7 +185,9 @@ class BossPermissionState extends State<BossPermission> {
                   Container(
                     decoration: const BoxDecoration(
                       color: Color(0xff278cbd),
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10.0),
+                      ),
                     ),
                     child: TextField(
                       controller: alasanController,
@@ -137,8 +199,9 @@ class BossPermissionState extends State<BossPermission> {
                       ),
                       decoration: InputDecoration(
                         hintText: "Sampaikan alasan anda!",
-                        hintStyle:
-                            const TextStyle(color: Colors.white, fontSize: 20),
+                        hintStyle: const TextStyle(
+                          color: Color.fromARGB(150, 255, 255, 255),
+                        ),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: const BorderSide(
@@ -178,7 +241,8 @@ class BossPermissionState extends State<BossPermission> {
                         decoration: InputDecoration(
                           hintText: "Pilih tanggal mulai izin!",
                           hintStyle: const TextStyle(
-                              color: Colors.white, fontSize: 20),
+                            color: Color.fromARGB(150, 255, 255, 255),
+                          ),
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: const BorderSide(
@@ -234,7 +298,8 @@ class BossPermissionState extends State<BossPermission> {
                         decoration: InputDecoration(
                           hintText: "Pilih tanggal selesai izin!",
                           hintStyle: const TextStyle(
-                              color: Colors.white, fontSize: 20),
+                            color: Color.fromARGB(150, 255, 255, 255),
+                          ),
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: const BorderSide(
@@ -273,6 +338,61 @@ class BossPermissionState extends State<BossPermission> {
                         }),
                   ),
                   const SizedBox(
+                    height: 15,
+                  ),
+                  uploadimage != null
+                      ? Container()
+                      : SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: ElevatedButton(
+                            child: const Text(
+                              "Ambil Bukti Foto",
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            onPressed: () {
+                              chooseImage();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.0),
+                              ),
+                              primary: const Color(0xff278cbd),
+                            ),
+                          ),
+                        ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  uploadimage != null
+                      ? Image(image: FileImage(uploadimage!))
+                      : Container(),
+                  uploadimage != null
+                      ? SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: ElevatedButton(
+                            child: const Text(
+                              "Hapus Foto",
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                uploadimage = null;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.0),
+                              ),
+                              primary: Color.fromARGB(255, 189, 56, 39),
+                            ),
+                          ),
+                        )
+                      : Container(),
+                  const SizedBox(
                     height: 25,
                   ),
                   Row(
@@ -285,7 +405,9 @@ class BossPermissionState extends State<BossPermission> {
                             fontSize: 16,
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          sendizin();
+                        },
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16.0),

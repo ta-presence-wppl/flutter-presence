@@ -143,4 +143,50 @@ class ApiRoutes {
       ));
     }
   }
+
+  //Izin
+  Future<MResponse?> izinIN(File fileImage, String? _jenis, String? _ket,
+      String? _tglAwal, String? _tglAkhir) async {
+    try {
+      final SharedPreferences prefs = await _prefs;
+      final String? token = prefs.getString('token');
+
+      ///[1] CREATING INSTANCE
+      var dioRequest = dio.Dio();
+      dioRequest.options.baseUrl = _baseAPI;
+
+      //[2] ADDING TOKEN
+      dioRequest.options.headers = {
+        'Authorization': token,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      };
+
+      //[3] ADDING EXTRA INFO
+      var formData = dio.FormData.fromMap({
+        'jenis_izin': '$_jenis',
+        'ket': '$_ket',
+        'tgl_awal': '$_tglAwal',
+        'tgl_akhir': '$_tglAkhir'
+      });
+
+      //[4] ADD IMAGE TO UPLOAD
+      var file = await dio.MultipartFile.fromFile(fileImage.path,
+          filename: basename(fileImage.path),
+          contentType: MediaType("image", basename(fileImage.path)));
+
+      formData.files.add(MapEntry('image', file));
+
+      //[5] SEND TO SERVER
+      var response = await dioRequest.post(
+        '/izin_service/izin',
+        data: formData,
+      );
+      return responseData(response.data);
+    } catch (err) {
+      Map<String, dynamic> retval = {
+        "message": "Anda Telah Mengajukan Izin Hari Ini"
+      };
+      return responseData(retval);
+    }
+  }
 }

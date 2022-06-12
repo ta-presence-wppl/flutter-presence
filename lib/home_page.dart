@@ -115,8 +115,8 @@ class HomePageState extends State<HomePage> {
     return res!;
   }
 
-  Future<void> getInfov2() async {
-    String? res = await _apiRoutes.getAbsenStatus(context).then((_user) {
+  void getInfov2() async {
+    await _apiRoutes.getAbsenStatus(context).then((_user) {
       _statusAbsent = _user!.responseMessage;
     });
   }
@@ -407,17 +407,19 @@ class HomePageState extends State<HomePage> {
         ),
       ),
       body: RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: _refresh,
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Stack(children: <Widget>[
-            SingleChildScrollView(
-              child: _listPage[_selectedTabIndex],
-            )
-          ]),
-        ),
-      ),
+          key: _refreshIndicatorKey,
+          onRefresh: _refresh,
+          child: SingleChildScrollView(
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: Stack(children: <Widget>[
+                ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: []),
+                _listPage[_selectedTabIndex]
+              ]),
+            ),
+          )),
       drawer: _buildDrawer(),
       bottomNavigationBar: _bottomNavBar,
     );

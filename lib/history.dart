@@ -2,13 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/icon_data.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:wppl_frontend/api/api_routes.dart';
 import 'package:wppl_frontend/home_page.dart';
 import 'package:wppl_frontend/models/m_history.dart';
-import 'package:wppl_frontend/settings_page.dart';
-import 'package:wppl_frontend/salary.dart';
-import 'package:wppl_frontend/boss_permission.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:wppl_frontend/widgets/CustomMonthPicker.dart';
 
 class History extends StatefulWidget {
   @override
@@ -38,9 +38,13 @@ class HistoryState extends State<History> {
   final _formatter = DateFormat('yyyy');
   final ApiRoutes _apiRoutes = ApiRoutes();
   String formattedDate = "";
+  String _datePicker = 'Pilih Bulan';
+  String _dateSelected = DateTime.now().toString();
+
   @override
   void initState() {
     super.initState();
+    initializeDateFormatting();
     formattedDate = _formatter.format(_now);
   }
 
@@ -85,66 +89,71 @@ class HistoryState extends State<History> {
           child: ListView(
             children: [
               SingleChildScrollView(
-                child: Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Color(0xff278cbd),
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    selectedItemBuilder: (BuildContext context) {
-                      return _listMonth.map((value) {
-                        return Text(
-                          value,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'ABZReg',
-                          ),
-                        );
-                      }).toList();
-                    },
-                    hint: Text(
-                      "Pilih bulan presensi!",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'ABZReg'),
-                    ),
-                    icon: const Icon(
-                      Icons.arrow_drop_down_sharp,
-                      color: Colors.white,
-                    ),
-                    value: _valMonth,
-                    underline: Container(
-                      height: 3,
-                      color: Colors.white,
-                    ),
-                    items: _listMonth.map((value) {
-                      return DropdownMenuItem<String>(
-                        child: Text(
-                          value,
-                          style: TextStyle(
-                              color: Color(0xff278cbd),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'ABZReg'),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: const BoxDecoration(
+                          color: Color(0xff278cbd),
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
                         ),
-                        value: value,
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _valMonth =
-                            value; //Untuk memberitahu _valGender bahwa isi nya akan diubah sesuai dengan value yang kita pilih
-                      });
-                    },
+                        child: DropdownButton<String>(
+                          isExpanded: true,
+                          selectedItemBuilder: (BuildContext context) {
+                            return _listMonth.map((value) {
+                              return Text(
+                                value,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'ABZReg',
+                                ),
+                              );
+                            }).toList();
+                          },
+                          hint: const Text(
+                            "Pilih bulan presensi!",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'ABZReg'),
+                          ),
+                          icon: const Icon(
+                            Icons.arrow_drop_down_sharp,
+                            color: Colors.white,
+                          ),
+                          value: _valMonth,
+                          underline: Container(
+                            height: 3,
+                            color: Colors.white,
+                          ),
+                          items: _listMonth.map((value) {
+                            return DropdownMenuItem<String>(
+                              child: Text(
+                                value,
+                                style: const TextStyle(
+                                    color: Color(0xff278cbd),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'ABZReg'),
+                              ),
+                              value: value,
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            _getNumMonth(value ?? '');
+                            setState(() {
+                              _valMonth =
+                                  value; //Untuk memberitahu _valGender bahwa isi nya akan diubah sesuai dengan value yang kita pilih
+                            });
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
               SizedBox(
                 height: 20,
               ),
@@ -455,85 +464,64 @@ class HistoryState extends State<History> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).unfocus();
-                },
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: const BoxDecoration(
-                          color: Color(0xff278cbd),
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: Color(0xff278cbd),
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: TextButton(
+                    onPressed: () {
+                      DatePicker.showPicker(
+                        context,
+                        onChanged: (date) {},
+                        onConfirm: (date) {
+                          setState(
+                            () {
+                              _datePicker = DateFormat('MMMM yyyy', 'id')
+                                  .format(date)
+                                  .toString();
+                              _dateSelected = date.toString();
+                            },
+                          );
+                        },
+                        pickerModel: CustomMonthPicker(
+                          minTime: DateTime(2021, 01),
+                          maxTime: DateTime.now(),
+                          currentTime: DateTime.parse(_dateSelected),
+                          locale: LocaleType.id,
                         ),
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          selectedItemBuilder: (BuildContext context) {
-                            return _listMonth.map((value) {
-                              return Text(
-                                value,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'ABZReg',
-                                ),
-                              );
-                            }).toList();
-                          },
-                          hint: const Text(
-                            "Pilih bulan presensi!",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'ABZReg'),
-                          ),
-                          icon: const Icon(
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _datePicker,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'ABZReg'),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(top: 2.0, left: 8.0),
+                          child: Icon(
                             Icons.arrow_drop_down_sharp,
                             color: Colors.white,
                           ),
-                          value: _valMonth,
-                          underline: Container(
-                            height: 3,
-                            color: Colors.white,
-                          ),
-                          items: _listMonth.map((value) {
-                            return DropdownMenuItem<String>(
-                              child: Text(
-                                value,
-                                style: const TextStyle(
-                                    color: Color(0xff278cbd),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'ABZReg'),
-                              ),
-                              value: value,
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            _getNumMonth(value ?? '');
-                            setState(() {
-                              _valMonth =
-                                  value; //Untuk memberitahu _valGender bahwa isi nya akan diubah sesuai dengan value yang kita pilih
-                            });
-                          },
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
             FutureBuilder(
-              future: _apiRoutes.getHistoryAbsen(
-                  context,
-                  formattedDate +
-                      '-' +
-                      _valMonthNum +
-                      '-26'), // a previously-obtained Future<String> or null
+              future: _apiRoutes.getHistoryAbsen(context,
+                  _dateSelected), // a previously-obtained Future<String> or null
               builder: (BuildContext context,
                   AsyncSnapshot<List<MHistori>?> snapshot) {
                 if (snapshot.hasError) {
@@ -663,6 +651,11 @@ class HistoryState extends State<History> {
               ),
             ),
           )
-        : const Text("Kosong!");
+        : const SizedBox(
+            height: 100,
+            child: Center(
+              child: Text("Kosong!"),
+            ),
+          );
   }
 }
