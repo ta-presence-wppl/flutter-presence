@@ -211,33 +211,6 @@ class HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
             ],
           ),
-          // Container(
-          //   child: FutureBuilder<String>(
-          //     future: getInfo(),
-          //     builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          //       switch (snapshot.connectionState) {
-          //         case ConnectionState.waiting:
-          //           return const CircularProgressIndicator();
-          //         default:
-          //           if (snapshot.hasError) {
-          //             return Text('Error: ${snapshot.error}');
-          //           } else {
-          //             return Text(
-          //               '${snapshot.data}',
-          //               textAlign: TextAlign.left,
-          //               style: const TextStyle(
-          //                 color: Color.fromARGB(255, 35, 141, 9),
-          //                 fontWeight: FontWeight.bold,
-          //                 fontFamily: 'ABZReg',
-          //                 fontSize: 14,
-          //               ),
-          //             );
-          //           }
-          //       }
-          //     },
-          //   ),
-          //   margin: const EdgeInsets.all(16.0),
-          // ),
           Container(
             child: Text(
               _statusAbsent ?? '-',
@@ -306,10 +279,12 @@ class HomePageState extends State<HomePage> {
                 label: const Text(
                   "Presensi Masuk",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  chooseImage();
+                },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16.0),
@@ -323,10 +298,12 @@ class HomePageState extends State<HomePage> {
                 label: const Text(
                   "Presensi Pulang",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  chooseImageOut();
+                },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16.0),
@@ -337,19 +314,19 @@ class HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
             ],
           ),
-          // Container(
-          //   child: Text(
-          //     _statusAbsent!,
-          //     textAlign: TextAlign.left,
-          //     style: const TextStyle(
-          //       color: Color.fromARGB(255, 35, 141, 9),
-          //       fontWeight: FontWeight.bold,
-          //       fontFamily: 'ABZReg',
-          //       fontSize: 14,
-          //     ),
-          //   ),
-          //   margin: const EdgeInsets.all(16.0),
-          // ),
+          Container(
+            child: Text(
+              _statusAbsent ?? '-',
+              textAlign: TextAlign.left,
+              style: const TextStyle(
+                color: Color.fromARGB(255, 35, 141, 9),
+                fontWeight: FontWeight.bold,
+                fontFamily: 'ABZReg',
+                fontSize: 14,
+              ),
+            ),
+            margin: const EdgeInsets.all(16.0),
+          ),
           Container(
             child: const Text(
               "Lokasi WFO anda saat ini:",
