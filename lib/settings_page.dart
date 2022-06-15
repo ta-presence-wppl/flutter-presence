@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/icon_data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wppl_frontend/api/api_routes.dart';
 import 'package:wppl_frontend/home_page.dart';
 import 'package:wppl_frontend/history.dart';
+import 'package:wppl_frontend/login_view.dart';
 import 'package:wppl_frontend/salary.dart';
 import 'package:wppl_frontend/boss_permission.dart';
 
@@ -15,13 +18,41 @@ class SettingsPage extends StatefulWidget {
 
 class SettingsPageState extends State<SettingsPage> {
   int _selectedTabIndex = 0;
-  void _onNavBarTapped(int index) {
-    setState(() {
-      _selectedTabIndex = index;
-    });
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  final ApiRoutes _apiRoutes = ApiRoutes();
+  bool showPassword = true;
+  final _username = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+
+  void saveSettings() async {
+    try {
+      print(_username.text);
+      _apiRoutes
+          .putSettings(context, _username.text, _email.text, _password.text)
+          .then(
+            (value) => {
+              logout(),
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(value!.responseMessage!),
+                ),
+              ),
+            },
+          );
+    } catch (e) {
+      print(e);
+    }
   }
 
-  bool showPassword = false;
+  Future<Null> logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
+  }
+
   @override
   Widget build(BuildContext context) {
     final ButtonStyle style = ElevatedButton.styleFrom(
@@ -63,9 +94,9 @@ class SettingsPageState extends State<SettingsPage> {
               const SizedBox(
                 height: 35,
               ),
-              buildTextField("Nama Lengkap", "Borneo Satria Pratama", false),
-              buildTextField("E-mail", "borneo.spratama@gmail.com", false),
-              buildTextField("Password", "********", true),
+              buildTextField("Nama Lengkap", "", false, _username),
+              buildTextField("E-mail", "", false, _email),
+              buildTextField("Password", "", true, _password),
               const SizedBox(
                 height: 35,
               ),
@@ -77,7 +108,9 @@ class SettingsPageState extends State<SettingsPage> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     color: Colors.red,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                     child: const Text("BATAL",
                         style: TextStyle(
                             fontSize: 16,
@@ -87,7 +120,9 @@ class SettingsPageState extends State<SettingsPage> {
                             color: Colors.white)),
                   ),
                   RaisedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      saveSettings();
+                    },
                     color: Colors.green,
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     elevation: 2,
@@ -128,11 +163,12 @@ class SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget buildTextField(
-      String labelText, String placeholder, bool isPasswordTextField) {
+  Widget buildTextField(String labelText, String placeholder,
+      bool isPasswordTextField, TextEditingController contrl) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 35.0),
       child: TextField(
+        controller: contrl, //set username controller
         obscureText: isPasswordTextField ? showPassword : false,
         decoration: InputDecoration(
             suffixIcon: isPasswordTextField

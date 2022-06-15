@@ -189,4 +189,44 @@ class ApiRoutes {
       return responseData(retval);
     }
   }
+
+  //Settings
+  Future<MResponse?> putSettings(BuildContext context, String? nama,
+      String? email, String? password) async {
+    try {
+      final SharedPreferences prefs = await _prefs;
+      final String? token = prefs.getString('token');
+      final dataSend = <String, String>{'': ''};
+      final nameAdd = <String, String>{'nama': nama!};
+      final emailAdd = <String, String>{'email': email!};
+      final passwordAdd = <String, String>{'password': password!};
+
+      if (nama != '') {
+        dataSend.addEntries(nameAdd.entries);
+      }
+      if (email != '') {
+        dataSend.addEntries(emailAdd.entries);
+      }
+      if (password != '') {
+        dataSend.addEntries(passwordAdd.entries);
+      }
+
+      ///[1] CREATING INSTANCE
+      var dioRequest = dio.Dio();
+      dioRequest.options.baseUrl = _baseAPI;
+      dioRequest.options.responseType = dio.ResponseType.json;
+
+      ///[2] ADDING TOKEN
+      dioRequest.options.headers = {'Authorization': token};
+
+      ///[3] SEND TO SERVER
+      var response = await dioRequest.put('/auth_service/settings/update-user',
+          data: dataSend);
+      return responseData(response.data);
+    } catch (err) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Kesalahan pada Server!'),
+      ));
+    }
+  }
 }

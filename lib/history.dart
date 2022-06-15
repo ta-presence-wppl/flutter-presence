@@ -5,7 +5,7 @@ import 'package:flutter/src/widgets/icon_data.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:wppl_frontend/api/api_routes.dart';
-import 'package:wppl_frontend/home_page.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:wppl_frontend/models/m_history.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:wppl_frontend/widgets/CustomMonthPicker.dart';
@@ -44,6 +44,7 @@ class HistoryState extends State<History> {
   @override
   void initState() {
     super.initState();
+    Intl.defaultLocale = "id";
     initializeDateFormatting();
     formattedDate = _formatter.format(_now);
   }
@@ -70,6 +71,97 @@ class HistoryState extends State<History> {
   void _getNumMonth(String _name) {
     List.generate(_listMonth.length,
         (i) => _listMonth[i] == _name ? _valMonthNum = (i + 1).toString() : '');
+  }
+
+  Future<void> _handleClickMe(MHistori data) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true, // user must tap button!
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(_parseDate(data.tanggal!)),
+          content: Container(
+            child: Column(
+              children: [
+                // Text(
+                //   profile.statusPresence,
+                //   textAlign: TextAlign.center,
+                //   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                // ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Text('Masuk'),
+                            Text(
+                              _parseTime(data.jamMsk!),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Text('Pulang'),
+                            Text(_parseTime(data.jamPlg ?? '-'))
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: data.fotoMsk != ''
+                            ? CachedNetworkImage(
+                                imageUrl: data.fotoMsk!,
+                                placeholder: (context, url) =>
+                                    Center(child: CircularProgressIndicator()),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              )
+                            : Text('-'),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: data.fotoPlg != ''
+                            ? CachedNetworkImage(
+                                imageUrl: data.fotoPlg!,
+                                placeholder: (context, url) =>
+                                    Center(child: CircularProgressIndicator()),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              )
+                            : Text('-'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Close', style: TextStyle(color: Color(0xFF6200EE))),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -561,40 +653,71 @@ class HistoryState extends State<History> {
                         Radius.circular(10.0),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          _parseDate(data.tanggal!),
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'ABZReg'),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        const Divider(
-                          color: Colors.white,
-                          height: 5,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
+                    child: InkWell(
+                      splashColor: Colors.blue.withAlpha(30),
+                      onTap: () {
+                        _handleClickMe(data);
+                      },
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            _parseDate(data.tanggal!),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'ABZReg'),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          const Divider(
+                            color: Colors.white,
+                            height: 5,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                  padding: const EdgeInsets.only(
+                                      left: 20.0, right: 20.0, bottom: 5.0),
+                                  child: Column(
+                                    children: [
+                                      const Text(
+                                        'Presensi Masuk',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'ABZReg'),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        _parseTime(data.jamMsk!),
+                                        style: const TextStyle(
+                                            color: Color(0xffc2e5d3),
+                                            fontSize: 40,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'ABZReg'),
+                                      ),
+                                    ],
+                                  )),
+                              Container(
                                 padding: const EdgeInsets.only(
                                     left: 20.0, right: 20.0, bottom: 5.0),
                                 child: Column(
                                   children: [
                                     const Text(
-                                      'Presensi Masuk',
+                                      'Presensi Pulang',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
@@ -605,7 +728,7 @@ class HistoryState extends State<History> {
                                       height: 5,
                                     ),
                                     Text(
-                                      _parseTime(data.jamMsk!),
+                                      _parseTime(data.jamPlg ?? '-'),
                                       style: const TextStyle(
                                           color: Color(0xffc2e5d3),
                                           fontSize: 40,
@@ -613,37 +736,12 @@ class HistoryState extends State<History> {
                                           fontFamily: 'ABZReg'),
                                     ),
                                   ],
-                                )),
-                            Container(
-                              padding: const EdgeInsets.only(
-                                  left: 20.0, right: 20.0, bottom: 5.0),
-                              child: Column(
-                                children: [
-                                  const Text(
-                                    'Presensi Pulang',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'ABZReg'),
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    _parseTime(data.jamPlg ?? '-'),
-                                    style: const TextStyle(
-                                        color: Color(0xffc2e5d3),
-                                        fontSize: 40,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'ABZReg'),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
