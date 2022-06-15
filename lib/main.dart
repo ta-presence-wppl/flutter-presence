@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:wppl_frontend/atasan/home_page.dart';
 import 'package:wppl_frontend/boss_permission.dart';
 import 'package:wppl_frontend/history.dart';
 import 'package:wppl_frontend/home_page.dart';
@@ -23,6 +24,9 @@ void main() {
       '/histori': (context) => History(),
       '/pengajuan_izin': (context) => BossPermission(),
       '/pengaturan': (context) => SettingsPage(),
+
+      //Atasan
+      '/atasan/home': (context) => const HomeAtasan(),
     },
   ));
 }

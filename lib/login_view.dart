@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:wppl_frontend/atasan/home_page.dart';
 import 'package:wppl_frontend/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -51,13 +52,32 @@ class _LoginPage extends State<LoginPage> {
         await prefs.setString('jabatan', jsondata['data']['kode_jabatan']);
         await prefs.setString('token', jsondata['token']);
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) {
-              return HomePage();
-            },
-          ),
-        );
+        if (jsondata['data'] != null) {
+          if (jsondata['data']['kode_jabatan'].substring(0, 3) == 'SPV') {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) {
+                  return const HomeAtasan();
+                },
+              ),
+            );
+          } else {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) {
+                  return HomePage();
+                },
+              ),
+            );
+          }
+        }
+        // Navigator.of(context).pushReplacement(
+        //   MaterialPageRoute(
+        //     builder: (_) {
+        //       return HomePage();
+        //     },
+        //   ),
+        // );
         //print(jsondata['token']);
         // if (jsondata["error"]) {
         //   setState(() {

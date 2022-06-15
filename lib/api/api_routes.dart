@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 import 'package:wppl_frontend/models/m_history.dart';
+import 'package:wppl_frontend/models/m_history_atasan.dart';
 import 'package:wppl_frontend/models/m_response.dart';
 
 class ApiRoutes {
@@ -228,5 +229,35 @@ class ApiRoutes {
         content: Text('Kesalahan pada Server!'),
       ));
     }
+  }
+
+  //Atasan
+  //Absent
+  Future<List<MHistoriAtasan>?> getHistoryAbsenAtasan(
+      BuildContext context, String myDate) async {
+    try {
+      final SharedPreferences prefs = await _prefs;
+      final String? token = prefs.getString('token');
+
+      ///[1] CREATING INSTANCE
+      var dioRequest = dio.Dio();
+      dioRequest.options.baseUrl = _baseAPI;
+
+      dioRequest.options.responseType = dio.ResponseType.json;
+
+      ///[2] ADDING TOKEN
+      dioRequest.options.headers = {'Authorization': token};
+
+      ///[3] SEND TO SERVER
+      Response<String> response =
+          await dioRequest.get('/atasan_service/absent/history?date=' + myDate);
+      return responseHistoriAtasan(response.data);
+    } catch (err) {
+      print(err.toString());
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Kesalahan pada Server!'),
+      ));
+    }
+    return null;
   }
 }
